@@ -1,5 +1,6 @@
+from __future__ import annotations
 from ._specifier_deleter import SpecifierDeleter
-from typing import get_type_hints
+from typing import get_type_hints, Any
 from typeguard import check_type, TypeCheckError
 import ast
 import os
@@ -11,7 +12,7 @@ class Template:
     _CALLER_FRAME = "f_back"
     _GLOBALS_KEY = "_globals"
 
-    def __new__(cls, _: str):
+    def __new__(cls, _: Any):
         instance = super(Template, cls).__new__(cls)
 
         frame = getattr(inspect.currentframe(), cls._CALLER_FRAME, None)
@@ -24,7 +25,7 @@ class Template:
 
         return instance
 
-    def __init__(self, content: str) -> None:
+    def __init__(self, content: Any) -> None:
         parsed_ast = self._parse_ast(content)
         specifier_deleter = SpecifierDeleter()
         modified_ast = specifier_deleter.visit(parsed_ast)
@@ -39,7 +40,7 @@ class Template:
         f_string = f'f"""{content}"""'
         return ast.parse(f_string, mode="eval")
 
-    def format(self, **kwargs) -> str:
+    def format(self, *_, **kwargs) -> str:
         values = {}
         for key, annotation in self.__annotations__.items():
             if key not in kwargs:
@@ -57,6 +58,12 @@ class Template:
             values[key] = str(value)
 
         return self.content.format(**values)
+
+    def __str__(self) -> str:
+        annotations = ", ".join(
+            f"{name}: {annotation}" for name, annotation in self.__annotations__.items()
+        )
+        return f"<Template({annotations})>"
 
 
 class FileTemplate(Template):

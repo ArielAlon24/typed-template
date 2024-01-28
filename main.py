@@ -10,14 +10,19 @@ class Header:
         return f"-=- {self.name} -=-"
 
 
-html = """{heading: Header}
+data1 = """{heading: Header}
 
 This is a test, here's today's date: {date: datetime},
 A template can (would) even utilize python's format options!
 And this is pi: {pi: float}.
 """
 
+data2 = "\n this is a continuation {number: int}"
 
-t = Template(html)
 
-print(t.format(heading=Header(name="this"), date=datetime.now(), pi=3.14))
+t1 = Template(data1)
+t2 = Template(data2)
+
+print(t1)
+
+print(t1.format(heading=Header(name="this"), date=datetime.now(), pi=3.14))
