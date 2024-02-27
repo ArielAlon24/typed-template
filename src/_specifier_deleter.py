@@ -28,6 +28,7 @@ class SpecifierDeleter(ast.NodeTransformer):
         constant = format_spec.values[0]
         if not isinstance(constant, ast.Constant):
             raise ParsingError("Could not find Constant node for type annotation.")
+
         annotation = constant.value
 
         self.__annotations__[name] = annotation.strip()

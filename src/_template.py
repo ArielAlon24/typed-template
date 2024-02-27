@@ -1,46 +1,65 @@
 from __future__ import annotations
 from ._specifier_deleter import SpecifierDeleter
-from typing import get_type_hints, Any
+from typing import get_type_hints, Any, Dict, Tuple
 from typeguard import check_type, TypeCheckError
+import types
 import ast
 import os
-import sys
 import inspect
 
 
-class Template:
+class Template(str):
     _CALLER_FRAME = "f_back"
-    _GLOBALS_KEY = "_globals"
 
-    def __new__(cls, _: Any):
-        instance = super(Template, cls).__new__(cls)
+    __slots__ = ("__annotations__",)
 
-        frame = getattr(inspect.currentframe(), cls._CALLER_FRAME, None)
-        if not frame:
-            raise ValueError("Could not find the caller frame.")
+    def __new__(
+        cls,
+        content: Any,
+        *,
+        _annotations: Dict[str, Any] | None = None,
+        _is_preprocessed: bool = False,
+    ):
+        annotations = {}
+        if _is_preprocessed:
+            instance = super().__new__(cls, content)
+            if not _annotations:
+                raise ValueError(
+                    "A preprocessed Template must provide __annotations__ dict."
+                )
+            annotations = _annotations
+        else:
+            frame = getattr(inspect.currentframe(), "f_back", None)
+            if not frame:
+                raise ValueError("Could not find caller's frame.")
 
-        module_name = inspect.getmodule(frame).__name__
+            content, annotations = cls._parse(content, frame)
+            instance = super().__new__(cls, content)
 
-        setattr(instance, cls._GLOBALS_KEY, sys.modules[module_name].__dict__)
+        instance.__annotations__ = annotations
 
         return instance
 
-    def __init__(self, content: Any) -> None:
-        parsed_ast = self._parse_ast(content)
+    def __init__(self, content: str) -> None:
+        super().__init__()
+
+    @staticmethod
+    def _parse(content: str, frame: types.FrameType) -> Tuple[str, Dict[str, Any]]:
+        f_string = f'f"""{content}"""'
+        parsed_ast = ast.parse(f_string, mode="eval")
         specifier_deleter = SpecifierDeleter()
         modified_ast = specifier_deleter.visit(parsed_ast)
         constant = modified_ast.body
-        self.content = ast.literal_eval(ast.unparse(constant))
-        self.__annotations__ = get_type_hints(
-            specifier_deleter, globalns=getattr(self, self._GLOBALS_KEY)
+        evaluated_content = ast.literal_eval(ast.unparse(constant))
+        annotations = get_type_hints(
+            specifier_deleter,
+            globalns=frame.f_globals,
+            localns=frame.f_locals,
         )
 
-    @staticmethod
-    def _parse_ast(content: str) -> ast.Expression:
-        f_string = f'f"""{content}"""'
-        return ast.parse(f_string, mode="eval")
+        return evaluated_content, annotations
 
-    def format(self, *_, **kwargs) -> str:
+    def __call__(self, /, **kwargs) -> str:
         values = {}
         for key, annotation in self.__annotations__.items():
             if key not in kwargs:
@@ -55,15 +74,43 @@ class Template:
                 raise TypeError(
                     f"Incorrect type for replacment '{key}', expected: {annotation}."
                 )
-            values[key] = str(value)
+            values[key] = value
 
-        return self.content.format(**values)
+        return self.format(**values)
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         annotations = ", ".join(
             f"{name}: {annotation}" for name, annotation in self.__annotations__.items()
         )
-        return f"<Template({annotations})>"
+        return f"<{self.__class__.__name__}({annotations})>"
+
+    def __add__(self, other: str) -> Template:
+        if isinstance(other, Template):
+            pass
+        else:
+            other = Template(other)
+
+        annotations = self.__annotations__ | other.__annotations__
+        return Template.__new__(
+            Template,
+            super().__add__(other),
+            _annotations=annotations,
+            _is_preprocessed=True,
+        )
+
+    def __mul__(self, other: Any) -> Template:
+        if not isinstance(other, int):
+            raise NotImplementedError
+
+        return Template.__new__(
+            Template,
+            super().__mul__(other),
+            _annotations=self.__annotations__,
+            _is_preprocessed=True,
+        )
+
+    def __rmul__(self, other: Any) -> Template:
+        return self.__mul__(other)
 
 
 class FileTemplate(Template):
