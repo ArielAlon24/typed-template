@@ -49,8 +49,8 @@ class Template(str):
         parsed_ast = ast.parse(f_string, mode="eval")
         specifier_deleter = SpecifierDeleter()
         modified_ast = specifier_deleter.visit(parsed_ast)
-        constant = modified_ast.body
-        evaluated_content = ast.literal_eval(ast.unparse(constant))
+        body = modified_ast.body
+        evaluated_content = ast.literal_eval(body)
         annotations = get_type_hints(
             specifier_deleter,
             globalns=frame.f_globals,

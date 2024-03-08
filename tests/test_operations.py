@@ -38,3 +38,10 @@ def test_str_count_method() -> None:
     template = Template("thiS iS a teSt for counting S")
 
     assert template.count("S") == 4
+
+
+def test_in_operator() -> None:
+    template = Template("The first 5 letters are: ABCDE")
+
+    assert "A" in template
+    assert "F" not in template
