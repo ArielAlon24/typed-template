@@ -64,7 +64,7 @@ class Template(str):
         for key, annotation in self.__annotations__.items():
             if key not in kwargs:
                 raise ValueError(
-                    f"Template uses {tuple(self.__annotations__.keys())} keys but is missing replacment '{key}'."
+                    f"Template uses {tuple(self.__annotations__.keys())} keys but is missing replacement '{key}'."
                 )
 
             value = kwargs[key]
@@ -72,7 +72,7 @@ class Template(str):
                 check_type(value, annotation)
             except TypeCheckError:
                 raise TypeError(
-                    f"Incorrect type for replacment '{key}', expected: {annotation}."
+                    f"Incorrect type for replacement '{key}', expected: {annotation}."
                 )
             values[key] = value
 

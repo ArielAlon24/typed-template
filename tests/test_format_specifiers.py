@@ -1,6 +1,8 @@
 from src import Template
 import math
 
+# typelate
+
 
 def test_float_round() -> None:
     template = Template("Pi is {pi: float: .2f}")
