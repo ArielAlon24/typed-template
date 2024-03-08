@@ -2,11 +2,11 @@
 
 Python templates with type annotations and validation.
 
-## Usage
+## Background
 
 A somewhat hidden feature in Python is the ability to create `str` templates, they are similar to f-strings but they don't require you to know the values in advance.
 
-```pycon
+```python
 template = "Hello, {name}!"
 ```
 
@@ -33,6 +33,8 @@ template = "Pi is {pi: .2f}"
 >>> template.format(pi=math.pi)
 "Pi is 3.14"
 ```
+
+## Usage
 
 With `typed-template` this behavior is extended even more, now you can specify types for each argument in the template, in runtime a template formatting will have validation that can be handled as you wish!
 
