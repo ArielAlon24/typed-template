@@ -1,7 +1,5 @@
-from src import Template
+from typelate import Template
 import math
-
-# typelate
 
 
 def test_float_round() -> None:

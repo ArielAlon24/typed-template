@@ -1,4 +1,4 @@
-from src import Template
+from typelate import Template
 import pytest
 
 

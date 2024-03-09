@@ -1,0 +1,29 @@
+[project]
+name = "typelate"
+version = "0.1.0"
+authors = [
+  { name="Ariel Alon"},
+]
+description = "Python templates with type annotations and validation."
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "iniconfig>=2.0.0",
+    "packaging>=23.2",
+    "pluggy>=1.4.0",
+    "typeguard>=4.1.5",
+    "typing_extensions>=4.10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/ArielAlon24/typed-template"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"

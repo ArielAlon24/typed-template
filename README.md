@@ -1,4 +1,4 @@
-# typed-template
+# typelate
 
 Python templates with type annotations and validation.
 
@@ -36,7 +36,7 @@ template = "Pi is {pi: .2f}"
 
 ## Usage
 
-With `typed-template` this behavior is extended even more, now you can specify types for each argument in the template, in runtime a template formatting will have validation that can be handled as you wish!
+With `typelate` this behavior is extended even more, now you can specify types for each argument in the template, in runtime a template formatting will have validation that can be handled as you wish!
 
 ```python
 from typed_template import Template

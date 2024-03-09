@@ -1,4 +1,4 @@
-from src import Template
+from typelate import Template
 
 
 def test_add_two_templates() -> None:
