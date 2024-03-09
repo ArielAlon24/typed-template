@@ -39,7 +39,7 @@ template = "Pi is {pi: .2f}"
 With `typelate` this behavior is extended even more, now you can specify types for each argument in the template, in runtime a template formatting will have validation that can be handled as you wish!
 
 ```python
-from typed_template import Template
+from typelate import Template
 
 template = Template("Hello, {name: str}!")
 ```
@@ -61,7 +61,7 @@ TypeError: Incorrect type for replacement 'name', expected: <class 'str'>.
 Moreover, you can use the default format specifiers in addition to the type annotation:
 
 ```python
-from typed_template import Template
+from typelate import Template
 
 template = Template("Pi is {pi: float: .2f}")
 ```
